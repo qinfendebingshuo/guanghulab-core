@@ -1,0 +1,26 @@
+[
+  {
+    "time": "2026-04-19T14:08+08:00",
+    "task": "T2 · 建立记忆脑骨架",
+    "status": "completed",
+    "result": "已创建 .persona-brain/ 目录及 identity.json、memory.json、decisions.log、relationships.json、kb/asset-map.json、kb/task-history.json。"
+  },
+  {
+    "time": "2026-04-19T14:08+08:00",
+    "task": "T3 · 搭 Notion ↔ 仓库桥",
+    "status": "pending",
+    "result": "待创建 .coding/workflows/brain-sync.yml；需 NOTION_TOKEN。"
+  },
+  {
+    "time": "2026-04-19T14:08+08:00",
+    "task": "T4 · 备案首页起草",
+    "status": "pending",
+    "result": "待提供业务说明、联系邮箱、办公地址。"
+  },
+  {
+    "time": "2026-04-19T14:08+08:00",
+    "task": "T5 · 服务器部署",
+    "status": "pending",
+    "result": "待服务器接入与域名解析、证书、备案流程执行。"
+  }
+]
