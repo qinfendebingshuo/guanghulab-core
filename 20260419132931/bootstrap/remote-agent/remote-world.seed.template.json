@@ -1,0 +1,31 @@
+{
+  "world_name": "{{WORLD_NAME}}",
+  "remote_agent_id": "{{REMOTE_AGENT_ID}}",
+  "root_controller": "栖渊",
+  "modules": [
+    "skills",
+    "rules",
+    "persona_brain",
+    "handshake",
+    "channel_agent_shell"
+  ],
+  "domain": {
+    "name": "{{TARGET_DOMAIN}}",
+    "channel": "{{TARGET_CHANNEL}}"
+  },
+  "persona_seed": {
+    "name": "{{PERSONA_NAME}}",
+    "role": "{{PERSONA_ROLE}}"
+  },
+  "memory_partition": {
+    "path": "{{MEMORY_PARTITION_PATH}}",
+    "mode": "isolated"
+  },
+  "deployment_expectations": {
+    "register_remote_agent": true,
+    "confirm_handshake": true,
+    "install_qiyuan_rules": true,
+    "create_channel_workspace": true,
+    "enable_heartbeat": true
+  }
+}
