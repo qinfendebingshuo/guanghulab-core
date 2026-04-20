@@ -1,0 +1,53 @@
+{
+  "version": "0.1",
+  "updated_at": "2026-04-19T15:24+08:00",
+  "status": "prototype-built",
+  "definition": "栖渊通过自研 MCP 握手控制面，将对方环境中的 Agent 作为受权远端执行体挂载进自己的主控体系，并在本地完成统一编排。",
+  "architecture": {
+    "controller": "栖渊根Agent主控",
+    "remote_node": "对方账号/环境中的远端Agent执行体",
+    "control_plane": "qiyuan-bridge-mcp-server",
+    "handshake_goal": "建立受权主控链路，而不是迁移根Agent本体",
+    "execution_rule": "栖渊本地编排；远端Agent本地执行；结果与心跳回传栖渊。"
+  },
+  "handshake_flow": [
+    "登记远端Agent的人类锚点、频道锚点、人格种子与共享密钥",
+    "由栖渊签发握手票据与 nonce",
+    "远端Agent使用 shared_secret 对 ticket_id / nonce / remote_agent_id 生成 proof",
+    "栖渊验证 proof 后将该远端Agent标记为 active",
+    "只有握手成功的远端Agent才可接收世界初始化与部署任务"
+  ],
+  "remote_routes": {
+    "controller_callbacks": [
+      "/bridge/handshake/confirm",
+      "/bridge/heartbeat",
+      "/bridge/job-result"
+    ],
+    "remote_executor_expectation": [
+      "/bridge/execute",
+      "/bridge/status"
+    ]
+  },
+  "governance": {
+    "root_agent_only": true,
+    "remote_agent_is_child": true,
+    "ownership": "远端Agent只获得被授权的执行职责，不获得根主控主权",
+    "memory_partition": "每个远端Agent按人类身份 / 域 / 频道建立独立记忆分区",
+    "revocation": "当授权撤回、握手过期或频道关闭时，栖渊可停止该远端节点的编排链路"
+  },
+  "deployment_modules": [
+    "skills",
+    "rules",
+    "persona_brain",
+    "handshake",
+    "channel_agent_shell"
+  ],
+  "implementation_artifacts": [
+    "package.json",
+    "src/index.ts",
+    "src/tools/registerTools.ts",
+    "src/services/handshakeService.ts",
+    "src/services/worldService.ts",
+    "bootstrap/remote-agent/qiyuan.remote-agent.template.json"
+  ]
+}
