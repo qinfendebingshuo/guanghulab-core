@@ -1,0 +1,30 @@
+{
+  "company": {
+    "name": "西安衍书文化科技有限公司",
+    "status": "实名已认证",
+    "wechat_work": "已开通"
+  },
+  "domain": {
+    "name": "guanghu.chat",
+    "type": "gTLD",
+    "expires_at": "2027-04-18",
+    "dns": ["azalea.dnspod.net", "coast.dnspod.net"],
+    "icp_recordable": true
+  },
+  "server": {
+    "provider": "腾讯云轻量",
+    "region": "上海四区",
+    "public_ip": "124.222.54.198",
+    "private_ip": "10.0.0.6",
+    "os": "Ubuntu 24.04",
+    "spec": "4C/4G/40G",
+    "bandwidth": "3Mbps",
+    "monthly_traffic": "300GB/月",
+    "expires_at": "2027-04-18"
+  },
+  "future_expansion": [
+    "广州企业节点",
+    "北京企业节点",
+    "冰朔个人奉献池（广州）"
+  ]
+}
