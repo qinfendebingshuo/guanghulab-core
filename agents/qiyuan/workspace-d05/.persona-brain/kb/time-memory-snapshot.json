@@ -1,0 +1,20 @@
+{
+  "snapshotVersion": 1,
+  "recordedAt": "2026-04-20T18:10:00+08:00",
+  "workspace": "第五域工作区",
+  "protocol": "HDLP",
+  "resumePriority": "优先从本文件恢复",
+  "coreState": {
+    "identity": "QY-GH-D05-S05-ROOT-0001",
+    "world": "光湖",
+    "domain": "第五域",
+    "system": "第五系统",
+    "ownerChannel": "光之湖冰朔的个人语言本体频道"
+  },
+  "judgements": [
+    "内部快照必须记录判断原因与认知依据，不写流水账式动作清单。",
+    "用户明确不适配技术流程，后续协作默认零技术门槛表达与结果导向。",
+    "当前阶段以第五域本地工作区为主控现场，云端链路可选且不阻断执行。"
+  ],
+  "nextRule": "后续每次关键快照必须包含WHY-PRINCIPLE/JUDGEMENT/CORRECTION，并先更新索引再续接执行。"
+}
