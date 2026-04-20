@@ -1,0 +1,1 @@
+{"version":3,"file":"remoteBridgeClient.d.ts","sourceRoot":"","sources":["../../src/services/remoteBridgeClient.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,aAAa,EAAE,iBAAiB,EAAE,oBAAoB,EAAE,MAAM,aAAa,CAAC;AAuBrF,qBAAa,kBAAkB;IACvB,QAAQ,CAAC,KAAK,EAAE,iBAAiB,EAAE,GAAG,EAAE,aAAa,EAAE,MAAM,UAAQ,GAAG,OAAO,CAAC,oBAAoB,CAAC;CA2D5G"}
