@@ -1,0 +1,162 @@
+{
+  "generatedAt": "2026-04-19T17:41:00+08:00",
+  "inventoryVersion": "1.1",
+  "instance": {
+    "instanceId": "lhins-0ocm6aro",
+    "instanceName": "QY-LH-MAIN-PROD-01",
+    "state": "RUNNING",
+    "platform": "UBUNTU",
+    "osName": "Ubuntu Server 24.04 LTS 64bit",
+    "apiRegion": "ap-shanghai",
+    "zone": "ap-shanghai-4",
+    "publicIp": "124.222.54.198",
+    "privateIp": "10.0.0.6",
+    "cpu": 4,
+    "memoryGiB": 4,
+    "systemDiskGiB": 40,
+    "bandwidthMbps": 3,
+    "sshKeyIds": [
+      "lhkp-rpuy7cbu"
+    ]
+  },
+  "connectivity": {
+    "lighthouseReadApi": "ok",
+    "sshPort22": "reachable_and_listening",
+    "httpPort80": "nginx_listening",
+    "httpsPort443": "not_listening_yet",
+    "tat": {
+      "status": "not_used_for_final_init",
+      "note": "baseline init completed manually in OrcaTerm; final hardening completed over verified SSH key login"
+    },
+    "sshBootstrap": {
+      "status": "key_login_verified",
+      "sshUser": "ubuntu",
+      "keyName": "QY_LH_MAIN_PROD_01",
+      "keyId": "lhkp-rpuy7cbu",
+      "loginVerified": true,
+      "verifiedBy": "ssh BatchMode test after baseline init and again after sshd hardening",
+      "effectiveSshd": {
+        "passwordAuthentication": "no",
+        "permitRootLogin": "no",
+        "pubkeyAuthentication": "yes"
+      }
+    }
+  },
+  "firewall": {
+    "cloudRules": [
+      {
+        "protocol": "TCP",
+        "port": "443",
+        "cidr": "0.0.0.0/0",
+        "action": "ACCEPT",
+        "description": "HTTPS for Nginx and Certbot"
+      },
+      {
+        "protocol": "TCP",
+        "port": "22",
+        "cidr": "0.0.0.0/0",
+        "action": "ACCEPT",
+        "description": "Linux SSH登录"
+      },
+      {
+        "protocol": "TCP",
+        "port": "80",
+        "cidr": "0.0.0.0/0",
+        "action": "ACCEPT",
+        "description": "Web服务HTTP (80)，如 Apache、Nginx"
+      },
+      {
+        "protocol": "ICMP",
+        "port": "ALL",
+        "cidr": "0.0.0.0/0",
+        "action": "ACCEPT",
+        "description": "通过Ping测试网络连通性 (放通ALL ICMP)"
+      }
+    ],
+    "ufw": {
+      "status": "active",
+      "defaultIncoming": "deny",
+      "defaultOutgoing": "allow",
+      "allowedPorts": [
+        "22/tcp",
+        "80/tcp",
+        "443/tcp"
+      ]
+    },
+    "targetBaseline": [
+      "22/tcp",
+      "80/tcp",
+      "443/tcp"
+    ],
+    "nextStagePlan": "fail2ban and cloud-firewall 22/tcp closure deferred to hardening closeout stage"
+  },
+  "installedPackages": [
+    {
+      "name": "nginx",
+      "version": "1.24.0-2ubuntu7.6"
+    },
+    {
+      "name": "docker.io",
+      "version": "29.1.3-0ubuntu3~24.04.1"
+    },
+    {
+      "name": "ufw",
+      "version": "0.36.2-6"
+    },
+    {
+      "name": "certbot",
+      "version": "2.9.0-1"
+    },
+    {
+      "name": "python3-certbot-nginx",
+      "version": "2.9.0-1"
+    },
+    {
+      "name": "curl",
+      "version": "8.5.0-2ubuntu10.8"
+    },
+    {
+      "name": "git",
+      "version": "1:2.43.0-1ubuntu7.3"
+    },
+    {
+      "name": "jq",
+      "version": "1.7.1-3ubuntu0.24.04.1"
+    }
+  ],
+  "services": {
+    "active": [
+      "nginx",
+      "docker",
+      "ssh"
+    ],
+    "enabled": [
+      "nginx",
+      "docker",
+      "ssh"
+    ],
+    "listeningPorts": [
+      "22/tcp",
+      "80/tcp"
+    ]
+  },
+  "initialization": {
+    "status": "baseline_completed",
+    "completedSteps": [
+      "validated instance identity and running state via Lighthouse API",
+      "standardized API region to ap-shanghai and preserved zone ap-shanghai-4",
+      "created and associated bootstrap SSH key pair",
+      "baseline init script executed manually in OrcaTerm",
+      "verified SSH key login as ubuntu",
+      "confirmed nginx docker ssh services are enabled and active",
+      "applied DEC-015 sshd hardening with effective PasswordAuthentication no, PermitRootLogin no, PubkeyAuthentication yes",
+      "captured installed package inventory and UFW baseline"
+    ],
+    "pendingSteps": [
+      "install and tune fail2ban during closeout stage",
+      "close cloud firewall 22/tcp during closeout stage after confirming emergency access procedure",
+      "configure HTTPS listener and certificates for guanghu.chat / www.guanghu.chat"
+    ],
+    "blockers": []
+  }
+}
