@@ -1,0 +1,21 @@
+# Sensitive files
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+
+# macOS
+.DS_Store
+
+# Runtime
+node_modules/
+dist/
+build/
+coverage/
+
+# Logs
+*.log
