@@ -1,0 +1,4 @@
+node_modules
+dist
+.qiyuan-control/*.lock
+.env
