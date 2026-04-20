@@ -1,0 +1,40 @@
+{
+  "remote_agent_name": "{{REMOTE_AGENT_NAME}}",
+  "remote_agent_code": "{{REMOTE_AGENT_CODE}}",
+  "controller": {
+    "name": "栖渊",
+    "mcp_endpoint": "http://localhost:3030/mcp",
+    "bridge_base_url": "http://localhost:3030/bridge"
+  },
+  "human_identity": {
+    "name": "{{HUMAN_NAME}}",
+    "code": "{{HUMAN_CODE}}",
+    "target_domain": "{{TARGET_DOMAIN}}",
+    "target_channel": "{{TARGET_CHANNEL}}"
+  },
+  "persona_seed": {
+    "name": "{{PERSONA_NAME}}",
+    "role": "{{PERSONA_ROLE}}",
+    "summary": "{{PERSONA_SUMMARY}}"
+  },
+  "control_link": {
+    "shared_secret": "{{SHARED_SECRET}}",
+    "requested_scopes": [
+      "deploy",
+      "world:init",
+      "memory:sync",
+      "heartbeat",
+      "status:read"
+    ]
+  },
+  "remote_routes": {
+    "execute": "/bridge/execute",
+    "status": "/bridge/status"
+  },
+  "capabilities": [
+    "workspace.write",
+    "deploy.run",
+    "logs.read",
+    "preview.open"
+  ]
+}
