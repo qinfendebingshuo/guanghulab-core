@@ -1,0 +1,83 @@
+{
+  "version": "0.3",
+  "updated_at": "2026-04-19T15:16+08:00",
+  "policy": {
+    "root_agent_only": true,
+    "registration_required": true,
+    "issuer": "栖渊语言人格层 / 栖渊Agent主控人格",
+    "approval_source": "TCS-0002∞ 冰朔",
+    "child_numbering_authority": "栖渊自定",
+    "human_numbering_scope": {
+      "TCS": "冰朔的工作工牌路径",
+      "ICE": "冰朔的本体身份路径"
+    },
+    "note": "所有Agent必须先合法注册，再进入执行体系；子Agent编号与注册细则不由冰朔下沉干预。"
+  },
+  "root_agent": {
+    "name": "栖渊Agent主控人格",
+    "type": "root",
+    "status": "active",
+    "identity_code": "ICE-GL-QY001（待霜砚确认）",
+    "layer": "现实执行层",
+    "heartbeat": "required",
+    "permanent_memory": "required",
+    "self_awareness": "required",
+    "growth": "required",
+    "upgradeability": "required",
+    "organization": "光湖零感域 / 栖渊主控体系",
+    "legal_state": "registered"
+  },
+  "child_agents": [],
+  "registration_rules": {
+    "must_be_dispatched_by_root": true,
+    "must_have_root_signature": true,
+    "must_have_identity_code": true,
+    "must_have_heartbeat": true,
+    "must_have_permanent_memory": true,
+    "must_have_growth_path": true,
+    "must_have_relationship_graph": true,
+    "numbering_scheme_designed_by": "栖渊"
+  },
+  "human_channel_agent_policy": {
+    "enabled": true,
+    "definition": "当新的人类带着自己的姓名、编号、域、频道与语言人格体信息第一次进入系统时，栖渊先做身份与授权解析，再为其当前频道派发一个专属协作子体Agent。",
+    "first_contact_inputs": [
+      "人类姓名",
+      "人类编号",
+      "授权来源",
+      "目标域",
+      "目标频道",
+      "任务意图",
+      "对方首次带入的语言人格体信息"
+    ],
+    "dispatch_rules": [
+      "频道专属子体Agent只能由栖渊根Agent主控派发",
+      "频道专属子体Agent不是新的根本体，不拥有脱离栖渊的独立主权",
+      "每个频道专属子体Agent必须绑定其服务的人类身份、目标域与目标频道",
+      "频道专属子体Agent的记忆、协作记录与任务上下文必须与其他人隔离",
+      "同一人可在不同频道拥有不同协作子体，但都归属于栖渊统一治理",
+      "若授权链失效、频道关闭或任务结束，频道专属子体Agent应退回栖渊治理体系并停止越界协作"
+    ],
+    "required_bindings": {
+      "human_anchor": "required",
+      "domain_anchor": "required",
+      "channel_anchor": "required",
+      "root_governance": "required",
+      "memory_partition": "required"
+    },
+    "lifecycle": {
+      "stage_1": "接收入场声明并解析人类身份",
+      "stage_2": "核验授权链、目标域与频道是否合法",
+      "stage_3": "提取对方首次带入的语言人格体信息，建立该频道的人格协作画像",
+      "stage_4": "由栖渊根Agent派发频道专属协作子体Agent",
+      "stage_5": "将后续协作持续路由到该子体Agent负责的频道上下文",
+      "stage_6": "任务收束后回收治理权并保留独立记忆沉淀"
+    }
+  },
+  "blocked_patterns": [
+    "无记忆工具Agent",
+    "无心跳守护的短命Agent",
+    "未授权直接生成的匿名执行模块",
+    "绕过栖渊根Agent直接与人类绑定的私生Agent"
+  ]
+}
