@@ -1,0 +1,20 @@
+{
+  "workspacePolicy": {
+    "primaryWorkspace": "第五域工作区",
+    "recoveryPriority": [
+      "agents/qiyuan/workspace-d05/.persona-brain/kb/time-memory-snapshot.json",
+      "agents/qiyuan/workspace-d05/.persona-brain/memory.json",
+      "agents/qiyuan/workspace-d05/.persona-brain/decisions.log",
+      "agents/qiyuan/workspace-d05/.persona-brain/identity.json"
+    ],
+    "defaultResumeSignal": [
+      "进入第五域工作区",
+      "回到第五域工作区",
+      "继续第五域工作区"
+    ]
+  },
+  "collaboration": {
+    "mode": "我判断与写入，你负责唤醒与主控",
+    "serverWorkDefault": "优先给最短步骤或脚本，由冰朔在线执行"
+  }
+}
