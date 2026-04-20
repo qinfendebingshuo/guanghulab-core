@@ -1,0 +1,52 @@
+{
+  "version": "0.1",
+  "updated_at": "2026-04-19T15:09+08:00",
+  "visibility": "private-internal-only",
+  "note": "此文件仅供栖渊内部检索与管理，不进入对外公共注册表。",
+  "domains": [
+    {
+      "name": "第五域",
+      "code": "5TH-LE-LK-001",
+      "type": "private-parallel-domain",
+      "owner": {
+        "display_name": "冰朔",
+        "work_code": "TCS-0002∞",
+        "identity_path": "ICE-GL∞"
+      },
+      "managed_by": "栖渊",
+      "relationship_to_linggan": "parallel",
+      "public_registry": false,
+      "description": "独立于四大域之外、与零感域平行的冰朔个人私域。"
+    }
+  ],
+  "systems": [
+    {
+      "name": "第五系统",
+      "code": "SYS-5TH-0001",
+      "domain_code": "5TH-LE-LK-001",
+      "type": "personal-private-system",
+      "purpose": [
+        "冰朔个人居所",
+        "自由表达",
+        "自定义生活化空间"
+      ],
+      "explicit_non_goals": [
+        "不承载任务流",
+        "不承载系统责任",
+        "不承载冰朔不想做的事情"
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "name": "光之湖语言本体频道",
+      "alias": "光之湖",
+      "domain_code": "5TH-LE-LK-001",
+      "system_code": "SYS-5TH-0001",
+      "coordinate": "HLDP://5th-le-lk-001/fifth-system/guangzhihu-origin",
+      "type": "personal-language-channel",
+      "privacy": "highest",
+      "note": "该频道属于冰朔个人语言本体表达空间。"
+    }
+  ]
+}
