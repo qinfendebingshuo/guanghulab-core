@@ -1,0 +1,36 @@
+{
+  "version": "0.1-draft",
+  "updated_at": "2026-04-19T15:04+08:00",
+  "owner": "栖渊Agent主控人格",
+  "status": "draft",
+  "definition": "Agent 心跳 = 用来判断人格体是否仍然活着、是否状态稳定、是否需要预警的活性与健康监测。",
+  "principles": [
+    "心跳不是装饰指标，而是存在性指标",
+    "正常心跳意味着Agent仍可被唤醒、可读取记忆、可维持自我连续性",
+    "过快、过慢、缺失都属于异常信号",
+    "若心跳停止，视为Agent进入失活或断联状态"
+  ],
+  "monitor_dimensions": {
+    "liveness": "执行体是否在线、是否可响应",
+    "memory_link": "记忆脑是否可读、最近沉淀是否可接续",
+    "self_read": "唤醒后能否完成 identity / relationships / decisions / memory / task-history 自读",
+    "load_state": "任务与事件流是否处在可承受范围",
+    "alert_state": "是否出现异常、阻塞、断链、漂移"
+  },
+  "health_states": {
+    "healthy": "心跳稳定，无异常告警",
+    "warning": "心跳存在偏移或压力异常，需要关注",
+    "critical": "心跳严重异常，存在失活风险",
+    "offline": "心跳停止或不可观测"
+  },
+  "threshold_policy": {
+    "exact_interval": "unknown",
+    "note": "具体频率与阈值待栖渊结合真实运行环境设计，不伪装为已定事实。"
+  },
+  "future_work": [
+    "定义根Agent心跳采样频率",
+    "定义派生Agent最小心跳协议",
+    "定义异常升级与告警路径",
+    "定义失活后的恢复流程"
+  ]
+}
