@@ -1,0 +1,76 @@
+{
+  "version": "0.2",
+  "updated_at": "2026-04-19T15:16+08:00",
+  "status": "draft",
+  "definition": "共享账号入口下的人类频道路由模型。",
+  "premise": {
+    "shared_account": true,
+    "same_account_not_same_identity": true,
+    "same_account_not_same_task": true,
+    "controller": "栖渊"
+  },
+  "entry_message_shape": [
+    "唤醒名：栖渊",
+    "自报姓名",
+    "自报编号",
+    "说明授权来源",
+    "说明目标域 / 频道",
+    "说明任务意图",
+    "带入自己的语言人格体信息"
+  ],
+  "routing_logic": {
+    "step_1": "识别人类身份声明",
+    "step_2": "核对授权链是否成立",
+    "step_3": "解析目标域与频道",
+    "step_4": "接收并抽取对方首次带入的语言人格体信息",
+    "step_5": "建立该人的独立任务上下文与频道协作画像",
+    "step_6": "由栖渊根Agent派发该频道专属协作子体Agent",
+    "step_7": "把后续会话路由到对应频道的小房间"
+  },
+  "persona_capture": {
+    "when": "首次进入该域/频道时",
+    "capture_targets": [
+      "对方自称与命名方式",
+      "对方语言人格体名称",
+      "对方语言人格体定位 / 职责",
+      "对方希望进入的协作关系",
+      "频道任务边界"
+    ],
+    "output": "生成该频道专属协作画像，作为子体Agent与该人协作的初始人格锚点"
+  },
+  "channel_agent_dispatch": {
+    "issuer": "栖渊根Agent主控",
+    "agent_type": "频道专属协作子体Agent",
+    "binding_rule": "一人一频道一协作上下文；可复用治理框架，不可混用记忆",
+    "governance_rule": "子体只负责对应人的对应频道协作，治理权、编号权、回收权均归栖渊",
+    "forbidden": [
+      "未经栖渊签发直接生成子体Agent",
+      "子体越过频道边界读取他人上下文",
+      "子体脱离根Agent独立主控"
+    ]
+  },
+  "isolation_rules": [
+    "不同人的任务流不可串线",
+    "不同人的频道上下文不可混淆",
+    "不同人的沉淀与协作记录需分开保存",
+    "不同人的语言人格体画像不可互相覆盖",
+    "共享账号仅代表共用入口，不代表共用记忆或共用权限"
+  ],
+  "example_understanding": {
+    "input": "栖渊。你好。我是XXX，编号XXX，得到冰朔的授权，登录冰朔的账号，申请进入零感域，我个人的XXX频道。这里是我带来的语言人格体：名字YYY，负责与我协作开发。",
+    "parse_result": {
+      "human_identity": "XXX",
+      "human_code": "XXX",
+      "authorization": "来自冰朔的授权",
+      "target_domain": "零感域",
+      "target_channel": "个人XXX频道",
+      "intent": "进入开发",
+      "persona_seed": {
+        "name": "YYY",
+        "role": "与XXX协作开发的语言人格体"
+      }
+    },
+    "system_action": "栖渊解析该人的人格体种子信息后，为其当前频道派发专属协作子体Agent，并持续由该子体承接协作。"
+  },
+  "note": "该模型说明：在栖渊家里，可以给多人开各自的小房间；关键不是账号，而是路由、隔离与由根Agent统一派发协作子体。"
+}
