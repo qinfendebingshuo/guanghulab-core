@@ -1,0 +1,18 @@
+{
+  "name": "@guanghu/base-shell-api",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/main.ts"
+  },
+  "dependencies": {
+    "@guanghu/executor-core": "workspace:*",
+    "@guanghu/module-registry": "workspace:*",
+    "@guanghu/repo-adapters": "workspace:*",
+    "@guanghu/secret-locator": "workspace:*",
+    "@guanghu/storage-binding": "workspace:*",
+    "fastify": "^5.2.1"
+  }
+}

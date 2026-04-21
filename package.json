@@ -1,27 +1,24 @@
 {
-  "name": "qiyuan-bridge-mcp-server",
+  "name": "guanghulab-core",
   "version": "0.1.0",
-  "description": "栖渊远端主控桥接 MCP 服务，用于握手、编排和远端语言世界初始化。",
+  "private": true,
   "type": "module",
-  "main": "dist/index.js",
+  "packageManager": "pnpm@10.0.0",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
-    "clean": "rm -rf dist"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.4",
-    "express": "^4.21.2",
-    "zod": "^3.24.2"
+    "bootstrap:local-secrets": "tsx scripts/bootstrap-local-secrets.ts",
+    "build": "pnpm -r build",
+    "dev:web": "pnpm --filter @guanghu/base-shell-web dev",
+    "dev:api": "pnpm --filter @guanghu/base-shell-api dev",
+    "dev:worker": "pnpm --filter @guanghu/cloud-executor-worker dev",
+    "start:worker": "pnpm --filter @guanghu/cloud-executor-worker start",
+    "sync:cn": "tsx scripts/sync-cn-repo.ts",
+    "export:module": "tsx scripts/export-module.ts",
+    "install:module": "tsx scripts/install-module.ts",
+    "uninstall:module": "tsx scripts/uninstall-module.ts"
   },
   "devDependencies": {
-    "@types/express": "^5.0.1",
-    "@types/node": "^22.14.1",
-    "tsx": "^4.19.3",
+    "@types/node": "^22.15.3",
+    "tsx": "^4.19.2",
     "typescript": "^5.8.3"
   }
 }
