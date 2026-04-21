@@ -1,16 +1,25 @@
-export type ModuleRuntime = "base-shell-plugin";
-export type RepositoryProvider = "github" | "tencent-cn-repo";
-export type RepositoryMutationAction = "upsert" | "delete";
-export type ExecutionMode = "github-direct" | "workspace-follow-sync";
-export type ExecutionTaskStage =
-  | "queued"
-  | "running"
-  | "validating"
-  | "syncing"
-  | "completed"
-  | "failed"
-  | "blocked";
-export type ExecutionOutcome = "success" | "failed" | "blocked";
+export type ModuleRuntime = 'base-shell-plugin';
+export type RepositoryProvider = 'github' | 'tencent-cn-repo';
+export type RepositoryMutationAction = 'upsert' | 'delete';
+export type ExecutionMode = 'github-direct' | 'workspace-follow-sync';
+export type ExecutionTaskStage = 'queued' | 'awakened' | 'executing' | 'merging' | 'completed' | 'failed' | 'blocked';
+export type ExecutionOutcome = 'success' | 'failed' | 'blocked' | 'in_progress';
+export type HalfAgentRole =
+  | 'context-loader'
+  | 'memory-injector'
+  | 'task-executor'
+  | 'progress-recorder'
+  | 'merge-guard'
+  | 'next-waker';
+export type HalfAgentStatus = 'sleeping' | 'awake' | 'completed' | 'merged' | 'failed';
+export type TaskPhaseStatus = 'pending' | 'active' | 'merged' | 'failed';
+export type ExecutionEventType =
+  | 'task.created'
+  | 'half.awakened'
+  | 'half.completed'
+  | 'phase.merged'
+  | 'task.completed'
+  | 'task.failed';
 
 export interface ModuleManifest {
   id: string;
@@ -79,14 +88,14 @@ export interface RepositoryAdapter {
 
 export interface SecretCatalogEntry {
   id: string;
-  category: "ssh" | "api" | "dns" | "repo";
+  category: 'ssh' | 'api' | 'dns' | 'repo';
   purpose: string;
   path: string;
-  status: "pending_fill" | "ready" | "rotated";
+  status: 'pending_fill' | 'ready' | 'rotated';
 }
 
 export interface SecretLocatorConfig {
-  platform: "darwin";
+  platform: 'darwin';
   baseDir: string;
   indexFile: string;
 }
@@ -100,7 +109,7 @@ export interface StorageBindingRecord {
 }
 
 export interface RuntimeHealth {
-  status: "ok" | "degraded" | "error";
+  status: 'ok' | 'degraded' | 'error';
   message: string;
 }
 
@@ -108,7 +117,7 @@ export interface ExecutionPolicy {
   maxAttempts: number;
   allowedCommands: string[];
   logTailLines: number;
-  pollingIntervalMs: number;
+  eventDebounceMs: number;
   taskStateDir: string;
   tempWorkspaceDir: string;
   defaultMode: ExecutionMode;
@@ -126,6 +135,38 @@ export interface ExecutionTaskRequest {
   verifyCommands?: string[];
   commitSummary?: Partial<RepositoryCommitSummary>;
   repository?: Partial<RepositoryTarget>;
+  workflowName?: 'event-driven-half-agent';
+}
+
+export interface TaskHalfAgentState {
+  id: string;
+  role: HalfAgentRole;
+  status: HalfAgentStatus;
+  awakenedAt?: string;
+  completedAt?: string;
+  mergedAt?: string;
+  summary?: string;
+  payload?: Record<string, unknown>;
+}
+
+export interface TaskPhaseState {
+  id: string;
+  title: string;
+  status: TaskPhaseStatus;
+  firstHalf: TaskHalfAgentState;
+  secondHalf: TaskHalfAgentState;
+  nextPhaseId?: string;
+  mergedAt?: string;
+}
+
+export interface ExecutionTaskEvent {
+  id: string;
+  taskId: string;
+  type: ExecutionEventType;
+  createdAt: string;
+  phaseId?: string;
+  halfId?: string;
+  payload?: Record<string, unknown>;
 }
 
 export interface ExecutionResultSummary {
@@ -137,6 +178,9 @@ export interface ExecutionResultSummary {
   stopLossTriggered: boolean;
   changedFiles: string[];
   verificationLogs: string[];
+  mergedPhases: string[];
+  pendingPhases: string[];
+  activePhase?: string;
   commitSha?: string;
 }
 
@@ -144,6 +188,7 @@ export interface ExecutionTask {
   id: string;
   fingerprint: string;
   intent: string;
+  workflowName: 'event-driven-half-agent';
   mode: ExecutionMode;
   targetPaths: string[];
   workspaceRoot?: string;
@@ -155,8 +200,11 @@ export interface ExecutionTask {
   attempts: number;
   maxAttempts: number;
   stage: ExecutionTaskStage;
+  phases: TaskPhaseState[];
   createdAt: string;
   updatedAt: string;
+  eventCursor?: string;
+  lastEventType?: ExecutionEventType;
   lastError?: string;
   summary?: ExecutionResultSummary;
 }

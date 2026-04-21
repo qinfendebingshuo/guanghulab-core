@@ -1,33 +1,14 @@
-import process from "node:process";
-import { ExecutorRunner, FileExecutionTaskStore, loadExecutionPolicy } from "@guanghu/executor-core";
+import process from 'node:process';
+import { EventDrivenWorker, ExecutorRunner, FileExecutionTaskStore, loadExecutionPolicy } from '@guanghu/executor-core';
 
 const policy = loadExecutionPolicy();
 const taskStore = new FileExecutionTaskStore(policy.taskStateDir);
 const runner = new ExecutorRunner({ policy, taskStore });
-
-let timer: ReturnType<typeof setInterval> | undefined;
-
-async function tick() {
-  const task = await runner.runNextTask();
-
-  if (task) {
-    console.log(
-      JSON.stringify({
-        worker: "cloud-executor-worker",
-        taskId: task.id,
-        stage: task.stage,
-        updatedAt: task.updatedAt
-      })
-    );
-  }
-}
+const worker = new EventDrivenWorker({ runner, taskStore, policy });
 
 async function shutdown(signal: string) {
-  if (timer) {
-    clearInterval(timer);
-  }
-
-  console.log(JSON.stringify({ worker: "cloud-executor-worker", signal, status: "stopping" }));
+  worker.stop();
+  console.log(JSON.stringify({ worker: 'cloud-executor-worker', signal, status: 'stopping' }));
   process.exit(0);
 }
 
@@ -35,25 +16,23 @@ async function main() {
   await taskStore.ensureReady();
   console.log(
     JSON.stringify({
-      worker: "cloud-executor-worker",
-      status: "ready",
-      pollingIntervalMs: policy.pollingIntervalMs,
+      worker: 'cloud-executor-worker',
+      status: 'ready',
+      activationMode: 'event-driven-half-agent',
+      eventDebounceMs: policy.eventDebounceMs,
       taskStateDir: policy.taskStateDir
     })
   );
 
-  await tick();
-  timer = setInterval(() => {
-    void tick();
-  }, policy.pollingIntervalMs);
+  await worker.start();
 }
 
-process.on("SIGINT", () => {
-  void shutdown("SIGINT");
+process.on('SIGINT', () => {
+  void shutdown('SIGINT');
 });
 
-process.on("SIGTERM", () => {
-  void shutdown("SIGTERM");
+process.on('SIGTERM', () => {
+  void shutdown('SIGTERM');
 });
 
 main().catch((error) => {
