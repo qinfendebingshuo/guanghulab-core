@@ -1,0 +1,16 @@
+{
+  "region": "singapore",
+  "mode": "single-user",
+  "residentServices": ["base-shell-web", "base-shell-api", "cloud-executor-worker"],
+  "dynamicModules": true,
+  "forbiddenResidentPayloads": ["full-mother-repo", "inactive-modules", "user-data-mirror"],
+  "healthChecks": ["/health", "/modules", "/runtime/summary", "/executor/health"],
+  "executor": {
+    "stateDir": "/srv/guanghulab/executor/state",
+    "tempWorkspaceDir": "/srv/guanghulab/executor/tmp",
+    "maxAttempts": 2,
+    "allowedCommands": ["pnpm", "node", "tsx"],
+    "defaultMode": "github-direct",
+    "fallbackMode": "workspace-follow-sync"
+  }
+}

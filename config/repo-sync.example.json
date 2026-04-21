@@ -1,0 +1,21 @@
+{
+  "writeSurface": "github",
+  "sourceOfTruthBranch": "main",
+  "allowWorkspaceFollowSync": true,
+  "source": {
+    "provider": "github",
+    "repository": "qinfendebingshuo/guanghulab-core"
+  },
+  "target": {
+    "provider": "tencent-cn-repo",
+    "repository": "pending-cn-repo"
+  },
+  "mirrorOnlyTargets": ["tencent-cn-repo"],
+  "syncScope": ["modules", "registry", "release-notes", "templates"],
+  "forbiddenScope": ["user-data", "memory-private", "local-secrets", "runtime-cache"],
+  "followSyncPolicy": {
+    "requireGitHubFirst": true,
+    "maxAttempts": 2,
+    "commitMode": "batch"
+  }
+}

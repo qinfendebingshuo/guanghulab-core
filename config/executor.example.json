@@ -1,0 +1,11 @@
+{
+  "taskStateDir": "/srv/guanghulab/executor/state",
+  "tempWorkspaceDir": "/srv/guanghulab/executor/tmp",
+  "maxAttempts": 2,
+  "pollingIntervalMs": 5000,
+  "logTailLines": 40,
+  "defaultMode": "github-direct",
+  "fallbackMode": "workspace-follow-sync",
+  "allowedCommands": ["pnpm", "node", "tsx"],
+  "stopLossStages": ["failed", "blocked"]
+}
