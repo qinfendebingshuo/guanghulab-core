@@ -1,6 +1,6 @@
-import type { ExecutionPolicy } from '@guanghu/contracts';
-import { ExecutorRunner } from './executor-runner.js';
-import { FileExecutionTaskStore } from './task-store.js';
+import type { ExecutionPolicy } from "@guanghu/contracts";
+import { ExecutorRunner } from "./executor-runner.js";
+import { FileExecutionTaskStore } from "./task-store.js";
 
 interface EventDrivenWorkerOptions {
   runner: ExecutorRunner;
@@ -41,7 +41,7 @@ export class EventDrivenWorker {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
 
-      if (message.includes('AbortError') || message.includes('aborted')) {
+      if (message.includes("AbortError") || message.includes("aborted")) {
         return;
       }
 

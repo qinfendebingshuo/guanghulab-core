@@ -1,5 +1,5 @@
-import { spawn } from 'node:child_process';
-import process from 'node:process';
+import { spawn } from "node:child_process";
+import process from "node:process";
 import type {
   ExecutionPolicy,
   ExecutionResultSummary,
@@ -11,8 +11,8 @@ import type {
   RepositoryWriteResult,
   TaskHalfAgentState,
   TaskPhaseState
-} from '@guanghu/contracts';
-import { createRepositoryAdapters } from '@guanghu/repo-adapters';
+} from "@guanghu/contracts";
+import { createRepositoryAdapters } from "@guanghu/repo-adapters";
 import {
   canMergePhase,
   createDefaultTaskPhases,
@@ -24,8 +24,8 @@ import {
   markHalfAwake,
   markHalfCompleted,
   mergeTaskPhase
-} from './half-agent.js';
-import { cleanupTaskWorkspace, createTaskWorkspace, materializeMutations } from './temp-workspace.js';
+} from "./half-agent.js";
+import { cleanupTaskWorkspace, createTaskWorkspace, materializeMutations } from "./temp-workspace.js";
 import {
   buildTaskFingerprint,
   createTaskEventId,
@@ -36,8 +36,8 @@ import {
   resolveTaskRepository,
   shouldBlockTask,
   trimCommandOutput
-} from './task-policy.js';
-import { FileExecutionTaskStore } from './task-store.js';
+} from "./task-policy.js";
+import { FileExecutionTaskStore } from "./task-store.js";
 
 interface ExecutorRunnerOptions {
   policy?: Partial<ExecutionPolicy>;
@@ -55,7 +55,7 @@ interface HalfExecutionResult {
 
 function buildSummary(
   task: ExecutionTask,
-  input: Omit<ExecutionResultSummary, 'taskId' | 'mergedPhases' | 'pendingPhases'>
+  input: Omit<ExecutionResultSummary, "taskId" | "mergedPhases" | "pendingPhases">
 ): ExecutionResultSummary {
   return {
     taskId: task.id,
@@ -90,7 +90,7 @@ export class ExecutorRunner {
       id: createTaskId(),
       fingerprint,
       intent: request.intent,
-      workflowName: request.workflowName ?? 'event-driven-half-agent',
+      workflowName: request.workflowName ?? "event-driven-half-agent",
       mode,
       targetPaths: request.targetPaths,
       workspaceRoot: request.workspaceRoot,
@@ -101,20 +101,20 @@ export class ExecutorRunner {
       commitSummary: {
         title: request.commitSummary?.title ?? request.intent,
         body: request.commitSummary?.body,
-        actor: request.commitSummary?.actor ?? 'qiyuan-executor',
+        actor: request.commitSummary?.actor ?? "qiyuan-executor",
         taskId: request.commitSummary?.taskId,
         mode: request.commitSummary?.mode ?? mode
       },
       attempts: 0,
       maxAttempts: this.policy.maxAttempts,
-      stage: 'queued',
+      stage: "queued",
       phases: createDefaultTaskPhases(),
       createdAt: now,
       updatedAt: now
     };
 
     await this.taskStore.saveTask(task);
-    await this.queueEvent(this.buildEvent(task, 'task.created', { payload: { trigger: 'submitTask' } }));
+    await this.queueEvent(this.buildEvent(task, "task.created", { payload: { trigger: "submitTask" } }));
     return task;
   }
 
@@ -122,40 +122,40 @@ export class ExecutorRunner {
     const tasks = await this.taskStore.listActiveTasks();
 
     for (const task of tasks) {
-      if (task.stage === 'queued') {
-        await this.queueEvent(this.buildEvent(task, 'task.created', { payload: { trigger: 'resume' } }));
+      if (task.stage === "queued") {
+        await this.queueEvent(this.buildEvent(task, "task.created", { payload: { trigger: "resume" } }));
         continue;
       }
 
       const phase = getCurrentPhase(task);
 
       if (!phase) {
-        await this.queueEvent(this.buildEvent(task, 'task.completed', { payload: { trigger: 'resume' } }));
+        await this.queueEvent(this.buildEvent(task, "task.completed", { payload: { trigger: "resume" } }));
         continue;
       }
 
-      if (canMergePhase(phase) && phase.status !== 'merged') {
-        await this.queueEvent(this.buildEvent(task, 'phase.merged', { phaseId: phase.id, payload: { trigger: 'resume' } }));
+      if (canMergePhase(phase) && phase.status !== "merged") {
+        await this.queueEvent(this.buildEvent(task, "phase.merged", { phaseId: phase.id, payload: { trigger: "resume" } }));
         continue;
       }
 
-      if (phase.firstHalf.status === 'awake') {
-        await this.queueEvent(this.buildEvent(task, 'half.awakened', { phaseId: phase.id, halfId: phase.firstHalf.id, payload: { trigger: 'resume' } }));
+      if (phase.firstHalf.status === "awake") {
+        await this.queueEvent(this.buildEvent(task, "half.awakened", { phaseId: phase.id, halfId: phase.firstHalf.id, payload: { trigger: "resume" } }));
         continue;
       }
 
-      if (phase.secondHalf.status === 'awake') {
-        await this.queueEvent(this.buildEvent(task, 'half.awakened', { phaseId: phase.id, halfId: phase.secondHalf.id, payload: { trigger: 'resume' } }));
+      if (phase.secondHalf.status === "awake") {
+        await this.queueEvent(this.buildEvent(task, "half.awakened", { phaseId: phase.id, halfId: phase.secondHalf.id, payload: { trigger: "resume" } }));
         continue;
       }
 
-      if (phase.firstHalf.status === 'sleeping') {
-        await this.awakenHalfAndQueue(task, phase, phase.firstHalf, 'resume');
+      if (phase.firstHalf.status === "sleeping") {
+        await this.awakenHalfAndQueue(task, phase, phase.firstHalf, "resume");
         continue;
       }
 
-      if (phase.firstHalf.status === 'completed' && phase.secondHalf.status === 'sleeping') {
-        await this.awakenHalfAndQueue(task, phase, phase.secondHalf, 'resume');
+      if (phase.firstHalf.status === "completed" && phase.secondHalf.status === "sleeping") {
+        await this.awakenHalfAndQueue(task, phase, phase.secondHalf, "resume");
       }
     }
   }
@@ -193,17 +193,17 @@ export class ExecutorRunner {
 
   private async dispatchEvent(task: ExecutionTask, event: ExecutionTaskEvent): Promise<ExecutionTaskEvent[]> {
     switch (event.type) {
-      case 'task.created':
+      case "task.created":
         return this.onTaskCreated(task);
-      case 'half.awakened':
+      case "half.awakened":
         return this.onHalfAwakened(task, event);
-      case 'half.completed':
+      case "half.completed":
         return this.onHalfCompleted(task, event);
-      case 'phase.merged':
+      case "phase.merged":
         return this.onPhaseMerged(task, event);
-      case 'task.completed':
+      case "task.completed":
         return this.onTaskCompleted(task);
-      case 'task.failed':
+      case "task.failed":
       default:
         return [];
     }
@@ -229,12 +229,12 @@ export class ExecutorRunner {
   ): ExecutionTaskEvent {
     const now = new Date().toISOString();
     markHalfAwake(phase, half, now, { trigger });
-    task.stage = half.role === 'task-executor' ? 'executing' : 'awakened';
+    task.stage = half.role === "task-executor" ? "executing" : "awakened";
     task.summary = buildSummary(task, {
       stage: task.stage,
-      outcome: 'in_progress',
+      outcome: "in_progress",
       message: `已唤醒 ${phase.title} 的 ${half.role}。`,
-      nextAction: '等待这一半完成，再与另一半合并。',
+      nextAction: "等待这一半完成，再与另一半合并。",
       stopLossTriggered: false,
       changedFiles: task.summary?.changedFiles ?? [],
       verificationLogs: task.summary?.verificationLogs ?? [],
@@ -242,7 +242,7 @@ export class ExecutorRunner {
       activePhase: phase.id
     });
 
-    return this.buildEvent(task, 'half.awakened', {
+    return this.buildEvent(task, "half.awakened", {
       phaseId: phase.id,
       halfId: half.id,
       payload: { trigger }
@@ -251,7 +251,7 @@ export class ExecutorRunner {
 
   private buildEvent(
     task: ExecutionTask,
-    type: ExecutionTaskEvent['type'],
+    type: ExecutionTaskEvent["type"],
     options: { phaseId?: string; halfId?: string; payload?: Record<string, unknown> } = {}
   ): ExecutionTaskEvent {
     return {
@@ -273,25 +273,25 @@ export class ExecutorRunner {
     const phase = getCurrentPhase(task);
 
     if (!phase) {
-      return [this.buildEvent(task, 'task.completed', { payload: { trigger: 'task.created.no-pending-phase' } })];
+      return [this.buildEvent(task, "task.completed", { payload: { trigger: "task.created.no-pending-phase" } })];
     }
 
-    if (phase.firstHalf.status === 'sleeping') {
-      return [this.prepareHalfWake(task, phase, phase.firstHalf, 'task.created')];
+    if (phase.firstHalf.status === "sleeping") {
+      return [this.prepareHalfWake(task, phase, phase.firstHalf, "task.created")];
     }
 
-    if (phase.firstHalf.status === 'completed' && phase.secondHalf.status === 'sleeping') {
-      return [this.prepareHalfWake(task, phase, phase.secondHalf, 'task.created')];
+    if (phase.firstHalf.status === "completed" && phase.secondHalf.status === "sleeping") {
+      return [this.prepareHalfWake(task, phase, phase.secondHalf, "task.created")];
     }
 
-    if (canMergePhase(phase) && phase.status !== 'merged') {
+    if (canMergePhase(phase) && phase.status !== "merged") {
       mergeTaskPhase(phase, new Date().toISOString());
-      task.stage = 'merging';
+      task.stage = "merging";
       task.summary = buildSummary(task, {
-        stage: 'merging',
-        outcome: 'in_progress',
+        stage: "merging",
+        outcome: "in_progress",
         message: `${phase.title} 的两半已经具备合并条件。`,
-        nextAction: '写入 phase.merged 事件，进入下一阶段。',
+        nextAction: "写入 phase.merged 事件，进入下一阶段。",
         stopLossTriggered: false,
         changedFiles: task.summary?.changedFiles ?? [],
         verificationLogs: task.summary?.verificationLogs ?? [],
@@ -299,7 +299,7 @@ export class ExecutorRunner {
         activePhase: phase.id
       });
 
-      return [this.buildEvent(task, 'phase.merged', { phaseId: phase.id, payload: { trigger: 'task.created' } })];
+      return [this.buildEvent(task, "phase.merged", { phaseId: phase.id, payload: { trigger: "task.created" } })];
     }
 
     return [];
@@ -318,20 +318,20 @@ export class ExecutorRunner {
 
     const { current } = getHalfPair(phase, event.halfId);
 
-    if (current.status !== 'awake') {
+    if (current.status !== "awake") {
       return [];
     }
 
     const result = await this.runHalfAgent(task, phase, current);
     const now = new Date().toISOString();
     markHalfCompleted(current, now, result.summary, result.payload);
-    task.stage = phase.id === 'execution-delivery' ? 'merging' : 'awakened';
+    task.stage = phase.id === "execution-delivery" ? "merging" : "awakened";
     task.lastError = undefined;
     task.summary = buildSummary(task, {
       stage: task.stage,
-      outcome: 'in_progress',
+      outcome: "in_progress",
       message: `${phase.title} 的 ${current.role} 已完成，等待与另一半合并。`,
-      nextAction: '等待另一半被唤醒并完成。',
+      nextAction: "等待另一半被唤醒并完成。",
       stopLossTriggered: false,
       changedFiles: result.changedFiles ?? task.summary?.changedFiles ?? [],
       verificationLogs: result.verificationLogs ?? task.summary?.verificationLogs ?? [],
@@ -339,7 +339,7 @@ export class ExecutorRunner {
       activePhase: phase.id
     });
 
-    return [this.buildEvent(task, 'half.completed', { phaseId: phase.id, halfId: current.id, payload: result.payload })];
+    return [this.buildEvent(task, "half.completed", { phaseId: phase.id, halfId: current.id, payload: result.payload })];
   }
 
   private async onHalfCompleted(task: ExecutionTask, event: ExecutionTaskEvent): Promise<ExecutionTaskEvent[]> {
@@ -355,14 +355,14 @@ export class ExecutorRunner {
 
     const { counterpart } = getHalfPair(phase, event.halfId);
 
-    if (canMergePhase(phase) && phase.status !== 'merged') {
+    if (canMergePhase(phase) && phase.status !== "merged") {
       mergeTaskPhase(phase, new Date().toISOString());
-      task.stage = 'merging';
+      task.stage = "merging";
       task.summary = buildSummary(task, {
-        stage: 'merging',
-        outcome: 'in_progress',
+        stage: "merging",
+        outcome: "in_progress",
         message: `${phase.title} 的两半已合并。`,
-        nextAction: phase.nextPhaseId ? '触发下一阶段的前半 Agent。' : '发布 task.completed 事件。',
+        nextAction: phase.nextPhaseId ? "触发下一阶段的前半 Agent。" : "发布 task.completed 事件。",
         stopLossTriggered: false,
         changedFiles: task.summary?.changedFiles ?? [],
         verificationLogs: task.summary?.verificationLogs ?? [],
@@ -370,11 +370,11 @@ export class ExecutorRunner {
         activePhase: phase.id
       });
 
-      return [this.buildEvent(task, 'phase.merged', { phaseId: phase.id, payload: { trigger: 'half.completed' } })];
+      return [this.buildEvent(task, "phase.merged", { phaseId: phase.id, payload: { trigger: "half.completed" } })];
     }
 
-    if (counterpart.status === 'sleeping') {
-      return [this.prepareHalfWake(task, phase, counterpart, 'half.completed')];
+    if (counterpart.status === "sleeping") {
+      return [this.prepareHalfWake(task, phase, counterpart, "half.completed")];
     }
 
     return [];
@@ -384,20 +384,25 @@ export class ExecutorRunner {
     const phase = event.phaseId ? getPhase(task, event.phaseId) : undefined;
     const nextPhase = phase?.nextPhaseId ? getPhase(task, phase.nextPhaseId) : getCurrentPhase(task);
 
-    if (nextPhase && nextPhase.status !== 'merged') {
-      const nextHalf = nextPhase.firstHalf.status === 'sleeping' ? nextPhase.firstHalf : nextPhase.secondHalf.status === 'sleeping' ? nextPhase.secondHalf : undefined;
+    if (nextPhase && nextPhase.status !== "merged") {
+      const nextHalf =
+        nextPhase.firstHalf.status === "sleeping"
+          ? nextPhase.firstHalf
+          : nextPhase.secondHalf.status === "sleeping"
+            ? nextPhase.secondHalf
+            : undefined;
 
       if (nextHalf) {
-        return [this.prepareHalfWake(task, nextPhase, nextHalf, 'phase.merged')];
+        return [this.prepareHalfWake(task, nextPhase, nextHalf, "phase.merged")];
       }
     }
 
-    task.stage = 'completed';
+    task.stage = "completed";
     task.summary = buildSummary(task, {
-      stage: 'completed',
-      outcome: 'success',
-      message: '当前任务的所有半 Agent 都已合并完成，任务闭环成立。',
-      nextAction: '如需继续任务链，请监听 task.completed 事件并派发下一个任务。',
+      stage: "completed",
+      outcome: "success",
+      message: "当前任务的所有半 Agent 都已合并完成，任务闭环成立。",
+      nextAction: "如需继续任务链，请监听 task.completed 事件并派发下一个任务。",
       stopLossTriggered: false,
       changedFiles: task.summary?.changedFiles ?? [],
       verificationLogs: task.summary?.verificationLogs ?? [],
@@ -405,16 +410,16 @@ export class ExecutorRunner {
       activePhase: undefined
     });
 
-    return [this.buildEvent(task, 'task.completed', { phaseId: phase?.id, payload: { trigger: 'phase.merged' } })];
+    return [this.buildEvent(task, "task.completed", { phaseId: phase?.id, payload: { trigger: "phase.merged" } })];
   }
 
   private async onTaskCompleted(task: ExecutionTask): Promise<ExecutionTaskEvent[]> {
-    task.stage = 'completed';
+    task.stage = "completed";
     task.summary = buildSummary(task, {
-      stage: 'completed',
-      outcome: 'success',
-      message: '任务已完成，完整 Agent 已由两半合并而成。',
-      nextAction: '可以用 task.completed 作为下一个半 Agent 的唤醒源。',
+      stage: "completed",
+      outcome: "success",
+      message: "任务已完成，完整 Agent 已由两半合并而成。",
+      nextAction: "可以用 task.completed 作为下一个半 Agent 的唤醒源。",
       stopLossTriggered: false,
       changedFiles: task.summary?.changedFiles ?? [],
       verificationLogs: task.summary?.verificationLogs ?? [],
@@ -429,16 +434,16 @@ export class ExecutorRunner {
     const message = error instanceof Error ? error.message : String(error);
     const attempts = task.attempts + 1;
     const blocked = shouldBlockTask(attempts, task.maxAttempts);
-    const stage: ExecutionTaskStage = blocked ? 'blocked' : 'failed';
+    const stage: ExecutionTaskStage = blocked ? "blocked" : "failed";
     const phase = event.phaseId ? getPhase(task, event.phaseId) : getCurrentPhase(task);
 
     if (phase) {
-      phase.status = 'failed';
+      phase.status = "failed";
 
       if (event.halfId) {
         try {
           const { current } = getHalfPair(phase, event.halfId);
-          current.status = 'failed';
+          current.status = "failed";
         } catch {
           // ignore invalid half id
         }
@@ -450,9 +455,9 @@ export class ExecutorRunner {
     task.lastError = message;
     task.summary = buildSummary(task, {
       stage,
-      outcome: blocked ? 'blocked' : 'failed',
+      outcome: blocked ? "blocked" : "failed",
       message,
-      nextAction: blocked ? '已触发止损，请补充新条件后重新派发任务。' : '当前任务停在未合并状态，需要人工确认后重新提交。',
+      nextAction: blocked ? "已触发止损，请补充新条件后重新派发任务。" : "当前任务停在未合并状态，需要人工确认后重新提交。",
       stopLossTriggered: blocked,
       changedFiles: task.summary?.changedFiles ?? [],
       verificationLogs: task.summary?.verificationLogs ?? [],
@@ -460,11 +465,11 @@ export class ExecutorRunner {
       activePhase: phase?.id
     });
 
-    return blocked ? [this.buildEvent(task, 'task.failed', { phaseId: phase?.id, halfId: event.halfId, payload: { message } })] : [];
+    return blocked ? [this.buildEvent(task, "task.failed", { phaseId: phase?.id, halfId: event.halfId, payload: { message } })] : [];
   }
 
   private getAdapter(task: ExecutionTask): RepositoryAdapter {
-    const adapter = this.adapters[task.repository.provider === 'github' ? 'github' : 'cn'];
+    const adapter = this.adapters[task.repository.provider === "github" ? "github" : "cn"];
 
     if (!adapter) {
       throw new Error(`未找到仓库适配器：${task.repository.provider}`);
@@ -495,23 +500,23 @@ export class ExecutorRunner {
         const child = spawn(executable, args, {
           cwd,
           env: process.env,
-          stdio: ['ignore', 'pipe', 'pipe']
+          stdio: ["ignore", "pipe", "pipe"]
         });
 
-        let stdout = '';
-        let stderr = '';
+        let stdout = "";
+        let stderr = "";
 
-        child.stdout.on('data', (chunk) => {
+        child.stdout.on("data", (chunk) => {
           stdout += chunk.toString();
         });
 
-        child.stderr.on('data', (chunk) => {
+        child.stderr.on("data", (chunk) => {
           stderr += chunk.toString();
         });
 
-        child.on('error', reject);
-        child.on('close', (code) => {
-          const merged = [stdout, stderr].filter(Boolean).join('\n');
+        child.on("error", reject);
+        child.on("close", (code) => {
+          const merged = [stdout, stderr].filter(Boolean).join("\n");
 
           if (code === 0) {
             resolve(merged);
@@ -534,28 +539,28 @@ export class ExecutorRunner {
     half: TaskHalfAgentState
   ): Promise<HalfExecutionResult> {
     switch (half.role) {
-      case 'context-loader':
+      case "context-loader":
         return {
-          summary: '已装载任务意图、目标路径与正式仓库边界。',
+          summary: "已装载任务意图、目标路径与正式仓库边界。",
           payload: {
             intent: task.intent,
             targetPathCount: task.targetPaths.length,
             repository: task.repository.repository
           }
         };
-      case 'memory-injector':
+      case "memory-injector":
         return {
-          summary: '已注入本任务所需的记忆入口、路径映射与编号边界。',
+          summary: "已注入本任务所需的记忆入口、路径映射与编号边界。",
           payload: {
             workflowName: task.workflowName,
             activePhase: phase.id
           }
         };
-      case 'task-executor':
+      case "task-executor":
         return this.performTaskExecution(task);
-      case 'progress-recorder':
+      case "progress-recorder":
         return {
-          summary: '已把执行结果收束为过程记录，等待与执行半 Agent 合并。',
+          summary: "已把执行结果收束为过程记录，等待与执行半 Agent 合并。",
           changedFiles: task.summary?.changedFiles ?? [],
           verificationLogs: task.summary?.verificationLogs ?? [],
           commitSha: task.summary?.commitSha,
@@ -563,25 +568,25 @@ export class ExecutorRunner {
             changedFileCount: task.summary?.changedFiles.length ?? 0
           }
         };
-      case 'merge-guard': {
+      case "merge-guard": {
         const pendingBeforeCompletion = listPendingPhaseIds(task).filter((phaseId) => phaseId !== phase.id);
 
         if (pendingBeforeCompletion.length > 0) {
-          throw new Error(`仍有未合并阶段：${pendingBeforeCompletion.join(', ')}`);
+          throw new Error(`仍有未合并阶段：${pendingBeforeCompletion.join(", ")}`);
         }
 
         return {
-          summary: '已确认前序阶段全部完成合并，可以执行最终收口。',
+          summary: "已确认前序阶段全部完成合并，可以执行最终收口。",
           payload: {
             mergedPhases: listMergedPhaseIds(task)
           }
         };
       }
-      case 'next-waker':
+      case "next-waker":
         return {
-          summary: '当前完整任务已经闭环，可把合并事件交给下一个半 Agent。',
+          summary: "当前完整任务已经闭环，可把合并事件交给下一个半 Agent。",
           payload: {
-            nextEvent: 'task.completed'
+            nextEvent: "task.completed"
           }
         };
       default:
@@ -596,15 +601,15 @@ export class ExecutorRunner {
     let writeResult = this.buildNoopWriteResult(task);
 
     try {
-      if (task.mode === 'github-direct' && task.verifyCommands.length > 0 && task.writeFiles.length > 0) {
+      if (task.mode === "github-direct" && task.verifyCommands.length > 0 && task.writeFiles.length > 0) {
         workspaceDir = await createTaskWorkspace(this.policy.tempWorkspaceDir, task.id);
         await materializeMutations(workspaceDir, task.writeFiles);
-        verificationLogs = await this.runVerifyCommands(task.verifyCommands, task.workspaceRoot ?? workspaceDir);
+        verificationLogs = await this.runVerifyCommands(task.verifyCommands, workspaceDir);
       }
 
-      if (task.mode === 'workspace-follow-sync') {
+      if (task.mode === "workspace-follow-sync") {
         if (!task.workspaceRoot) {
-          throw new Error('workspace-follow-sync 模式必须提供 workspaceRoot。');
+          throw new Error("workspace-follow-sync 模式必须提供 workspaceRoot。");
         }
 
         if (task.verifyCommands.length > 0) {
@@ -612,7 +617,7 @@ export class ExecutorRunner {
         }
       }
 
-      if (task.mode === 'github-direct') {
+      if (task.mode === "github-direct") {
         writeResult = task.writeFiles.length > 0 ? await adapter.writeFilesBatch(task.writeFiles, task.commitSummary) : this.buildNoopWriteResult(task);
       } else {
         writeResult =
@@ -627,19 +632,19 @@ export class ExecutorRunner {
 
       task.lastError = undefined;
       task.summary = buildSummary(task, {
-        stage: 'executing',
-        outcome: 'in_progress',
-        message: '核心开发改动已执行并写回正式仓库，等待过程记录半 Agent 与其合并。',
-        nextAction: '等待 progress-recorder 半 Agent 完成后进入最终合并。',
+        stage: "executing",
+        outcome: "in_progress",
+        message: "核心开发改动已执行并写回正式仓库，等待过程记录半 Agent 与其合并。",
+        nextAction: "等待 progress-recorder 半 Agent 完成后进入最终合并。",
         stopLossTriggered: false,
         changedFiles: writeResult.changedPaths,
         verificationLogs,
         commitSha: writeResult.commitSha,
-        activePhase: 'execution-delivery'
+        activePhase: "execution-delivery"
       });
 
       return {
-        summary: '已完成核心改动执行与正式仓库写回。',
+        summary: "已完成核心改动执行与正式仓库写回。",
         changedFiles: writeResult.changedPaths,
         verificationLogs,
         commitSha: writeResult.commitSha,

@@ -1,25 +1,32 @@
-export type ModuleRuntime = 'base-shell-plugin';
-export type RepositoryProvider = 'github' | 'tencent-cn-repo';
-export type RepositoryMutationAction = 'upsert' | 'delete';
-export type ExecutionMode = 'github-direct' | 'workspace-follow-sync';
-export type ExecutionTaskStage = 'queued' | 'awakened' | 'executing' | 'merging' | 'completed' | 'failed' | 'blocked';
-export type ExecutionOutcome = 'success' | 'failed' | 'blocked' | 'in_progress';
+export type ModuleRuntime = "base-shell-plugin";
+export type RepositoryProvider = "github" | "tencent-cn-repo";
+export type RepositoryMutationAction = "upsert" | "delete";
+export type ExecutionMode = "github-direct" | "workspace-follow-sync";
+export type ExecutionTaskStage =
+  | "queued"
+  | "awakened"
+  | "executing"
+  | "merging"
+  | "completed"
+  | "failed"
+  | "blocked";
+export type ExecutionOutcome = "success" | "failed" | "blocked" | "in_progress";
 export type HalfAgentRole =
-  | 'context-loader'
-  | 'memory-injector'
-  | 'task-executor'
-  | 'progress-recorder'
-  | 'merge-guard'
-  | 'next-waker';
-export type HalfAgentStatus = 'sleeping' | 'awake' | 'completed' | 'merged' | 'failed';
-export type TaskPhaseStatus = 'pending' | 'active' | 'merged' | 'failed';
+  | "context-loader"
+  | "memory-injector"
+  | "task-executor"
+  | "progress-recorder"
+  | "merge-guard"
+  | "next-waker";
+export type HalfAgentStatus = "sleeping" | "awake" | "completed" | "merged" | "failed";
+export type TaskPhaseStatus = "pending" | "active" | "merged" | "failed";
 export type ExecutionEventType =
-  | 'task.created'
-  | 'half.awakened'
-  | 'half.completed'
-  | 'phase.merged'
-  | 'task.completed'
-  | 'task.failed';
+  | "task.created"
+  | "half.awakened"
+  | "half.completed"
+  | "phase.merged"
+  | "task.completed"
+  | "task.failed";
 
 export interface ModuleManifest {
   id: string;
@@ -88,14 +95,14 @@ export interface RepositoryAdapter {
 
 export interface SecretCatalogEntry {
   id: string;
-  category: 'ssh' | 'api' | 'dns' | 'repo';
+  category: "ssh" | "api" | "dns" | "repo";
   purpose: string;
   path: string;
-  status: 'pending_fill' | 'ready' | 'rotated';
+  status: "pending_fill" | "ready" | "rotated";
 }
 
 export interface SecretLocatorConfig {
-  platform: 'darwin';
+  platform: "darwin";
   baseDir: string;
   indexFile: string;
 }
@@ -109,7 +116,7 @@ export interface StorageBindingRecord {
 }
 
 export interface RuntimeHealth {
-  status: 'ok' | 'degraded' | 'error';
+  status: "ok" | "degraded" | "error";
   message: string;
 }
 
@@ -135,7 +142,7 @@ export interface ExecutionTaskRequest {
   verifyCommands?: string[];
   commitSummary?: Partial<RepositoryCommitSummary>;
   repository?: Partial<RepositoryTarget>;
-  workflowName?: 'event-driven-half-agent';
+  workflowName?: "event-driven-half-agent";
 }
 
 export interface TaskHalfAgentState {
@@ -188,7 +195,7 @@ export interface ExecutionTask {
   id: string;
   fingerprint: string;
   intent: string;
-  workflowName: 'event-driven-half-agent';
+  workflowName: "event-driven-half-agent";
   mode: ExecutionMode;
   targetPaths: string[];
   workspaceRoot?: string;
