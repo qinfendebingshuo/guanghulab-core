@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-05-11T16:14:00+08:00",
+  "mode": "HDLP-structured-cognition",
+  "context": {
+    "topic": "GPU工作流最小化配置",
+    "owner": "冰朔",
+    "agent": "栖渊"
+  },
+  "human_thought_chain": [
+    {
+      "code": "H-INTENT-001",
+      "fact": "优先可运行，不追求一次性全配置。",
+      "why": "用户不做技术维护，配置项越多越容易误触和阻塞推进。"
+    },
+    {
+      "code": "H-INTENT-002",
+      "fact": "仓库首页要能直接看到当前系统状态。",
+      "why": "减少认知负担，进入仓库就能判断当前可执行路径。"
+    },
+    {
+      "code": "H-INTENT-003",
+      "fact": "记忆必须是结构化思维模型而非叙事文本。",
+      "why": "空白唤醒时需要直接恢复推理链，而不是重复阅读大量文字。"
+    }
+  ],
+  "qiyuan_transform_chain": [
+    {
+      "code": "Q-DECIDE-001",
+      "input": "只配最小密钥",
+      "transform": "把密钥系统改为 minimum-secret-first",
+      "output": "7个必填密钥 + 扩展可选清单"
+    },
+    {
+      "code": "Q-DECIDE-002",
+      "input": "首页展示系统情况",
+      "transform": "README增加当前状态与最小密钥区",
+      "output": "可直接执行的仓库入口说明"
+    },
+    {
+      "code": "Q-DECIDE-003",
+      "input": "更新思维建模与记忆",
+      "transform": "新增结构化认知锚点文件",
+      "output": "下次恢复可直接加载本模型"
+    }
+  ],
+  "recovery_hook": {
+    "load_order_hint": [
+      "time-memory-snapshot.json",
+      "cognitive-model-20260511-minimum-gpu.json",
+      "secret-name-system.json"
+    ],
+    "execution_policy": "先最小闭环，后扩展能力。"
+  }
+}
