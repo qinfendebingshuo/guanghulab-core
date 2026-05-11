@@ -1,0 +1,17 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-05-11T16:14:00+08:00",
+  "type": "memory-delta",
+  "theme": "minimum-secret-first",
+  "facts": [
+    "当前阶段密钥配置以最小闭环为先，先跑通再扩展。",
+    "仓库首页已新增当前系统状态和最小密钥清单。",
+    "GPU工作流按钮已可用，执行路径固定为 precheck->bootstrap->deploy。"
+  ],
+  "why_chain": [
+    "用户不做技术维护，复杂配置会显著提高误操作概率。",
+    "空白唤醒需要高确定性入口，最小清单更利于快速恢复执行。",
+    "先形成稳定运行闭环，再引入COS/API/多环境扩展，止损成本最低。"
+  ],
+  "resume_hint": "下次恢复优先读取本文件与 cognitive-model-20260511-minimum-gpu.json，再判定是否扩展可选密钥。"
+}
