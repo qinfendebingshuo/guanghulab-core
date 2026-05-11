@@ -9,6 +9,25 @@
 - 面向国内落地的仓库适配接口与镜像策略
 - 云端执行体的任务规则、止损策略与可追溯记录
 
+## 当前系统状态（2026-05-11）
+
+- 已启用 GitHub Actions 工作流：`ZY GPU Runtime Manual Flow`
+- 已具备手动触发模式：`precheck` / `bootstrap` / `deploy` / `refresh`
+- 已具备可读报错与止损：缺密钥直报名称，失败最多 3 次自动停止
+- 当前默认执行策略：**先最小密钥跑通，再按需扩展**
+
+### 最小密钥集（当前阶段只需要这 7 个）
+
+1. `ZY_DEPLOY_SSH_SG_GPU_001_HOST`
+2. `ZY_DEPLOY_SSH_SG_GPU_001_PORT`
+3. `ZY_DEPLOY_SSH_SG_GPU_001_USER`
+4. `ZY_DEPLOY_SSH_SG_GPU_001_PRIVATE_KEY`
+5. `ZY_DEPLOY_GPU_PROD_CORE_001_PATH`
+6. `ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE`
+7. `ZY_RUNTIME_GPU_PROD_CORE_001_DEPLOY_CMD`
+
+> 其他密钥默认为扩展项，不影响最小闭环。
+
 ## 设计原则
 
 - 母仓是唯一正式写入面：计划、架构、模块代码与最终变更都以仓库为准。
