@@ -1,0 +1,84 @@
+name: ZY GPU Runtime Manual Flow
+
+on:
+  workflow_dispatch:
+    inputs:
+      action_mode:
+        description: 执行模式
+        type: choice
+        required: true
+        default: precheck
+        options:
+          - precheck
+          - bootstrap
+          - deploy
+          - refresh
+      max_retries:
+        description: 最大重试次数
+        required: true
+        default: "3"
+      dry_run:
+        description: 仅检查不执行部署
+        type: boolean
+        required: true
+        default: false
+
+jobs:
+  gpu_runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      ACTION_MODE: ${{ github.event.inputs.action_mode }}
+      MAX_RETRIES: ${{ github.event.inputs.max_retries }}
+      DRY_RUN: ${{ github.event.inputs.dry_run }}
+
+      ZY_DEPLOY_SSH_SG_GPU_001_HOST: ${{ secrets.ZY_DEPLOY_SSH_SG_GPU_001_HOST }}
+      ZY_DEPLOY_SSH_SG_GPU_001_PORT: ${{ secrets.ZY_DEPLOY_SSH_SG_GPU_001_PORT }}
+      ZY_DEPLOY_SSH_SG_GPU_001_USER: ${{ secrets.ZY_DEPLOY_SSH_SG_GPU_001_USER }}
+      ZY_DEPLOY_SSH_SG_GPU_001_PRIVATE_KEY: ${{ secrets.ZY_DEPLOY_SSH_SG_GPU_001_PRIVATE_KEY }}
+      ZY_DEPLOY_GPU_PROD_CORE_001_PATH: ${{ secrets.ZY_DEPLOY_GPU_PROD_CORE_001_PATH }}
+      ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE: ${{ secrets.ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE }}
+      ZY_RUNTIME_GPU_PROD_CORE_001_DEPLOY_CMD: ${{ secrets.ZY_RUNTIME_GPU_PROD_CORE_001_DEPLOY_CMD }}
+      ZY_RUNTIME_GPU_PROD_CORE_001_BOOTSTRAP_CMD: ${{ secrets.ZY_RUNTIME_GPU_PROD_CORE_001_BOOTSTRAP_CMD }}
+      ZY_RUNTIME_GPU_PROD_CORE_001_PULL_MODEL_CMD: ${{ secrets.ZY_RUNTIME_GPU_PROD_CORE_001_PULL_MODEL_CMD }}
+      ZY_RUNTIME_GPU_PROD_CORE_001_BACKUP_CMD: ${{ secrets.ZY_RUNTIME_GPU_PROD_CORE_001_BACKUP_CMD }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare scripts
+        run: |
+          chmod +x scripts/ops/gpu/validate-secrets.sh
+          chmod +x scripts/ops/gpu/probe-and-deploy.sh
+
+      - name: Validate input and secrets
+        run: scripts/ops/gpu/validate-secrets.sh
+
+      - name: Precheck only
+        if: ${{ env.ACTION_MODE == 'precheck' }}
+        run: |
+          echo "✅ 预检查完成：密钥和基础格式通过。" >> $GITHUB_STEP_SUMMARY
+          echo "模式为 precheck，不执行部署。" >> $GITHUB_STEP_SUMMARY
+
+      - name: Run runtime with retry
+        if: ${{ env.ACTION_MODE != 'precheck' }}
+        run: |
+          set -euo pipefail
+          retries=0
+          max_retries="${MAX_RETRIES:-3}"
+          if ! [[ "$max_retries" =~ ^[0-9]+$ ]]; then
+            echo "::error::MAX_RETRIES 必须是数字"
+            exit 1
+          fi
+          until [ "$retries" -ge "$max_retries" ]; do
+            retries=$((retries + 1))
+            echo "--- 尝试第 $retries / $max_retries 次 ---"
+            if scripts/ops/gpu/probe-and-deploy.sh; then
+              echo "✅ 执行成功（第 $retries 次）" >> $GITHUB_STEP_SUMMARY
+              exit 0
+            fi
+            echo "⚠️ 第 $retries 次失败" >> $GITHUB_STEP_SUMMARY
+            sleep 8
+          done
+          echo "::error::部署失败：已达到最大重试次数 $max_retries，已自动停止。"
+          exit 1
