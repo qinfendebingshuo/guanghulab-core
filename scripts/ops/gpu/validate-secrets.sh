@@ -4,38 +4,38 @@ set -euo pipefail
 mode="${ACTION_MODE:-precheck}"
 
 required_common=(
-  ZY_DEPLOY_SSH_SG_GPU_001_HOST
-  ZY_DEPLOY_SSH_SG_GPU_001_PORT
-  ZY_DEPLOY_SSH_SG_GPU_001_USER
-  ZY_DEPLOY_SSH_SG_GPU_001_PRIVATE_KEY
+ZY_DEPLOY_SSH_SG_GPU_001_HOST
+ZY_DEPLOY_SSH_SG_GPU_001_PORT
+ZY_DEPLOY_SSH_SG_GPU_001_USER
+ZY_DEPLOY_SSH_SG_GPU_001_PRIVATE_KEY
 )
 
 required_bootstrap=(
-  ZY_DEPLOY_GPU_PROD_CORE_001_PATH
-  ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE
+ZY_DEPLOY_GPU_PROD_CORE_001_PATH
+ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE
 )
 
 required_deploy=(
-  ZY_RUNTIME_GPU_PROD_CORE_001_DEPLOY_CMD
+ZY_RUNTIME_GPU_PROD_CORE_001_DEPLOY_CMD
 )
 
 required=()
 required+=("${required_common[@]}")
 
 case "$mode" in
-  precheck)
-    ;;&
-  bootstrap|refresh)
-    required+=("${required_bootstrap[@]}")
-    ;;&
-  deploy)
-    required+=("${required_bootstrap[@]}")
-    required+=("${required_deploy[@]}")
-    ;;&
-  *)
-    echo "::error::ACTION_MODE 非法：$mode（允许 precheck/bootstrap/deploy/refresh）"
-    exit 1
-    ;;&
+precheck)
+  ;;
+bootstrap|refresh)
+  required+=("${required_bootstrap[@]}")
+  ;;
+deploy)
+  required+=("${required_bootstrap[@]}")
+  required+=("${required_deploy[@]}")
+  ;;
+*)
+  echo "::error::ACTION_MODE 非法：$mode（允许 precheck/bootstrap/deploy/refresh）"
+  exit 1
+  ;;
 esac
 
 missing=()
@@ -64,11 +64,6 @@ fi
 
 if ! grep -q "BEGIN" <<< "${ZY_DEPLOY_SSH_SG_GPU_001_PRIVATE_KEY}"; then
   echo "::error::ZY_DEPLOY_SSH_SG_GPU_001_PRIVATE_KEY 格式异常：缺少 BEGIN 边界"
-  exit 1
-fi
-
-if [ -n "${ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE:-}" ] && ! [[ "${ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE}" =~ ^[A-Z0-9_-]+$ ]]; then
-  echo "::error::ZY_RUNTIME_GPU_PROD_CORE_001_WORKSPACE 只能包含 A-Z0-9_-"
   exit 1
 fi
 
